@@ -14,4 +14,13 @@ public class UserDatabase {
     public static void adduser(UserAuthentication user) {
         users.add(user);
     }
+
+    public static UserAuthentication getUserByEmail(String email) {
+        for (UserAuthentication user : users) {
+            if (user.getEmail().equals(email)) {
+                return user;
+            }
+        }
+        return null;
+    }
 }

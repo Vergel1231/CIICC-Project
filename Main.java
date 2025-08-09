@@ -2,13 +2,15 @@ package com.gcash.main;
 
 import com.gcash.auth.UserAuthentication;
 import com.gcash.database.UserDatabase;
+import com.gcash.balance.CheckBalance;
 
 import java.util.Scanner;
 
 public class Main {
-    private static int userIdCounter = 1;
+    private static int userIdCounter = 4; // Start after dummy data
 
     public static void main(String[] args) {
+        preloadDummyUsers();
         Scanner scanner = new Scanner(System.in);
         boolean runApp = true;
 
@@ -18,22 +20,30 @@ public class Main {
             System.out.println("2. Login");
             System.out.println("3. Change PIN");
             System.out.println("4. Logout");
-            System.out.println("5. Exit");
+            System.out.println("5. Check Balance");
+            System.out.println("6. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); // consume newLine
 
             switch (choice) {
                 case 1 -> register(scanner);
                 case 2 -> login(scanner);
                 case 3 -> changePin(scanner);
                 case 4 -> logout(scanner);
-                case 5 -> runApp = false;
+                case 5 -> checkBalance(scanner);
+                case 6 -> runApp = false;
             }
         }
         scanner.close();
     }
 
+    private static void preloadDummyUsers() {
+        UserDatabase.addUser(new UserAuthentication(1, "Ver", "ver@example.com", "09171234567", "1234"));
+        UserDatabase.addUser(new UserAuthentication(1, "Minda", "minda@example.com", "09181234567", "5678"));
+        UserDatabase.addUser(new UserAuthentication(1, "Mar", "mar@example.com", "09191234567", "9090"));
+    }
+     
     private static void register(Scanner scanner) {
         System.out.print("Name: ");
         String name = scanner.nextLine();
@@ -63,18 +73,12 @@ public class Main {
         System.out.print("PIN: ");
         String pin = scanner.nextLine();
 
-        for (UserAuthentication user : UserDatabase.getUsers()) {
-            if (user.getEmail().equals(email)){
-                if (user.getPin().equals(pin)) {
-                    System.out.println("Login successful. User ID: " + user.getId());
-                    return;
-                } else {
-                    System.out.println("Incorrect PIN.");
-                    return;
-                }
-            }
+        UserAuthentication user = UserDatabase.getUserByEmail(email);
+        if (user != null && user.getPin().equals(pin)) {
+            System.out.println("Login successful. User ID: " + user.getId());
+        } else {
+            System.out.println("Authentication failed.");
         }
-        System.out.println("Email not found. Register first.");
     }
 
     private static void changePin(Scanner scanner) {
@@ -85,24 +89,38 @@ public class Main {
         System.out.print("New PIN: ");
         String newPin = scanner.nextLine();
 
-        for (UserAuthentication user : UserDatabase.getUsers()) {
-            if (user.getEmail().equals(email) && user.getPin().equals(oldPin)) {
-                if (newPin.matches("\\d{4}")) {
-                    user.setPin(newPin);
-                    System.out.println("PIN changed successfully.");
-                    return;
-                } else {
-                    System.out.println("New PIN must be 4 digits.");
-                    return;
-                }
+        UserAuthentication user = UserDatabase.getUserByEmail(email);
+        if (user != null && user.getPin().equals(oldPin)) {
+            if (newPin.matches("\\d{4}")) {
+                user.setPin(newPin);
+                System.out.println("PIN changed successfully.");
+            } else {
+                System.out.println("New PIN must be 4 digits.");
             }
+        } else {
+            System.out.println("Authentication failed.");
         }
-        System.out.println("Authentication failed.");
     }
 
     private static void logout(Scanner scanner) {
         System.out.print("Enter your email to logout: ");
         String email = scanner.nextLine();
         System.out.println(email + " successfully logged out.");
+    }
+
+    private static void checkBalance(Scanner scanner) {
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.print("PIN: ");
+        String pin = scanner.nextLine();
+
+        UserAuthentication user = UserDatabase.getUserByEmail(email);
+        if (user != null && user.getPin().equals(pin)) {
+            CheckBalance cb = new CheckBalance();
+            double balance = cb.getBalance(user.getId());
+            System.out.println("Your current balance is: P" + balance);
+        } else {
+            System.out.println("Authentication failed. Cannot retrieve balance.");
+        }
     }
 }
