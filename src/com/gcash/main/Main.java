@@ -1,13 +1,12 @@
-package com.gcash.main;
-
-import com.gcash.auth.UserAuthentication;
-import com.gcash.database.UserDatabase;
-import com.gcash.balance.CheckBalance;
-
+package src.com.gcash.main;
 import java.util.Scanner;
 
+import src.com.gcash.auth.UserAuthentication;
+import src.com.gcash.balance.CheckBalance;
+import src.com.gcash.database.UserDatabase;
+
 public class Main {
-    private static int userIdCounter = 4; // Start after dummy data
+    private static int userIdCounter = 4;
 
     public static void main(String[] args) {
         preloadDummyUsers();
@@ -22,9 +21,10 @@ public class Main {
             System.out.println("4. Logout");
             System.out.println("5. Check Balance");
             System.out.println("6. Exit");
+            System.out.println("7. Cash In");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newLine
+            scanner.nextLine();
 
             switch (choice) {
                 case 1 -> register(scanner);
@@ -33,6 +33,7 @@ public class Main {
                 case 4 -> logout(scanner);
                 case 5 -> checkBalance(scanner);
                 case 6 -> runApp = false;
+                case 7 -> cashIn(scanner);
             }
         }
         scanner.close();
@@ -40,10 +41,10 @@ public class Main {
 
     private static void preloadDummyUsers() {
         UserDatabase.addUser(new UserAuthentication(1, "Ver", "ver@example.com", "09171234567", "1234"));
-        UserDatabase.addUser(new UserAuthentication(1, "Minda", "minda@example.com", "09181234567", "5678"));
-        UserDatabase.addUser(new UserAuthentication(1, "Mar", "mar@example.com", "09191234567", "9090"));
+        UserDatabase.addUser(new UserAuthentication(2, "Minda", "minda@example.com", "09181234567", "5678"));
+        UserDatabase.addUser(new UserAuthentication(3, "Mar", "mar@example.com", "09191234567", "9090"));
     }
-     
+
     private static void register(Scanner scanner) {
         System.out.print("Name: ");
         String name = scanner.nextLine();
@@ -56,7 +57,7 @@ public class Main {
 
         if (validate(name, email, number, pin)) {
             UserAuthentication user = new UserAuthentication(userIdCounter++, name, email, number, pin);
-            UserDatabase.adduser(user);
+            UserDatabase.addUser(user);
             System.out.println("User registered successfully!");
         } else {
             System.out.println("Invalid data. Try again.");
@@ -121,6 +122,27 @@ public class Main {
             System.out.println("Your current balance is: P" + balance);
         } else {
             System.out.println("Authentication failed. Cannot retrieve balance.");
+        }
+    }
+
+    private static void cashIn(Scanner scanner) {
+        // Prompt for user credentials
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.print("PIN: ");
+        String pin = scanner.nextLine();
+
+        // Authenticate user
+        UserAuthentication user = UserDatabase.getUserByEmail(email);
+        if (user != null && user.getPin().equals(pin)) {
+            // Prompt for cash-in amount
+            System.out.print("Enter amount to cash in: ");
+            double amount = scanner.nextDouble();
+            scanner.nextLine(); // consume newline
+
+            src.com.gcash.transaction.CashIn.cashIn(user, amount);
+        } else {
+            System.out.println("Authentication failed. Cannot perform cash in.");
         }
     }
 }
