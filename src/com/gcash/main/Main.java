@@ -1,9 +1,11 @@
-package src.com.gcash.main;
+package com.gcash.main;
 import java.util.Scanner;
 
-import src.com.gcash.auth.UserAuthentication;
-import src.com.gcash.balance.CheckBalance;
-import src.com.gcash.database.UserDatabase;
+import com.gcash.transaction.CashTransfer;
+
+import com.gcash.auth.UserAuthentication;
+import com.gcash.balance.CheckBalance;
+import com.gcash.database.UserDatabase;
 
 public class Main {
     private static int userIdCounter = 4;
@@ -22,6 +24,7 @@ public class Main {
             System.out.println("5. Check Balance");
             System.out.println("6. Exit");
             System.out.println("7. Cash In");
+            System.out.println("8. Cash Transfer");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -34,6 +37,7 @@ public class Main {
                 case 5 -> checkBalance(scanner);
                 case 6 -> runApp = false;
                 case 7 -> cashIn(scanner);
+                case 8 -> cashTransfer(scanner);
             }
         }
         scanner.close();
@@ -140,9 +144,29 @@ public class Main {
             double amount = scanner.nextDouble();
             scanner.nextLine(); // consume newline
 
-            src.com.gcash.transaction.CashIn.cashIn(user, amount);
+            com.gcash.transaction.CashIn.cashIn(user, amount);
         } else {
             System.out.println("Authentication failed. Cannot perform cash in.");
+        }
+    }
+
+    private static void cashTransfer(Scanner scanner) {
+        System.out.print("Your Email: ");
+        String senderEmail = scanner.nextLine();
+        System.out.print("Your PIN: ");
+        String pin = scanner.nextLine();
+
+        UserAuthentication sender = UserDatabase.getUserByEmail(senderEmail);
+        if (sender != null && sender.getPin().equals(pin)) {
+            System.out.print("Recipient Email: ");
+            String recipientEmail = scanner.nextLine();
+            System.out.print("Amount to transfer: ");
+            double amount = scanner.nextDouble();
+            scanner.nextLine(); // consume newline
+
+            CashTransfer.cashTransfer(sender, recipientEmail, amount);
+        } else {
+            System.out.println("Authentication failed. Cannot perform transfer.");
         }
     }
 }

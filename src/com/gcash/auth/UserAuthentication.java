@@ -1,6 +1,6 @@
-package src.com.gcash.auth;
+package com.gcash.auth;
 
-import src.com.gcash.auth.UserAuthentication;
+import com.gcash.auth.UserAuthentication;
 
 public class UserAuthentication {
     private int id;

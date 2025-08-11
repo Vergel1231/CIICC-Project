@@ -1,4 +1,4 @@
-package src.com.gcash.transaction;
+package com.gcash.transaction;
 
 import java.util.Date;
 

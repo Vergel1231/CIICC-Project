@@ -1,7 +1,7 @@
-package src.com.gcash.transaction;
+package com.gcash.transaction;
 
-import src.com.gcash.auth.UserAuthentication;
-import src.com.gcash.database.UserDatabase;
+import com.gcash.auth.UserAuthentication;
+import com.gcash.database.UserDatabase;
 import java.util.Date;
 
 
@@ -15,7 +15,7 @@ public class CashIn {
         user.adjustBalance(amount);
 
         int transactionID = UserDatabase.getTransactions().size() + 1;
-        src.com.gcash.transaction.Transaction tx = new src.com.gcash.transaction.Transaction(
+        com.gcash.transaction.Transaction tx = new com.gcash.transaction.Transaction(
             transactionID,
             amount,
             user.getName(),

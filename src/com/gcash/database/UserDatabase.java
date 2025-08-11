@@ -1,7 +1,7 @@
-package src.com.gcash.database;
+package com.gcash.database;
 
-import src.com.gcash.auth.UserAuthentication;
-import src.com.gcash.transaction.Transaction;
+import com.gcash.auth.UserAuthentication;
+import com.gcash.transaction.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;

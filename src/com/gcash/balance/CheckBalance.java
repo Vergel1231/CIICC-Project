@@ -1,4 +1,4 @@
-package src.com.gcash.balance;
+package com.gcash.balance;
 
 import java.util.HashMap;
 import java.util.Map;
